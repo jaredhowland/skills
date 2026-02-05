@@ -32,8 +32,10 @@ example-pkg
 ├── README.md
 ├── pyproject.toml
 └── src
-    └── example_pkg
-        └── __init__.py
+│   └── example_pkg
+│       └── py.typed
+│       └── __init__.py
+├── tests
 ```
 
 Library structure (typed library example):
@@ -44,9 +46,10 @@ example-lib
 ├── README.md
 ├── pyproject.toml
 └── src
-    └── example_lib
-        ├── py.typed
-        └── __init__.py
+│   └── example_lib
+│       └── py.typed
+│       └── __init__.py
+├── tests
 ```
 
 ## Canonical pyproject.toml (template)
@@ -59,6 +62,9 @@ name = "example-pkg"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
+authors = [
+    { name = "Jared Howland", email = "example-pkg@jaredhowland.com" }
+]
 requires-python = ">=3.14"
 dependencies = []
 
@@ -71,7 +77,7 @@ build-backend = "uv_build"
 ```
 
 Notes:
-- Libraries should include a `py.typed` file inside the package directory so type checkers treat them as typed.
+- All projects should include a `py.typed` file inside the package directory so type checkers treat them as typed.
 - `requires-python` must be `">=3.14"` per organizational standard.
 
 ## Commands (always via UV)
@@ -82,12 +88,16 @@ Notes:
 
 - Lint / format with `ruff` via UV: ⚠️ run these through `uvx`
 
-  uvx ruff format .
-  uvx ruff check --fix .
+  `uvx ruff format .``
+  `uvx ruff check --fix .``
+
+- Run type checkers with `mypy` via UV:
+
+  `uvx mypy .``
 
 - Run tests (pytest) via UV:
 
-  uvx pytest -q
+  `uvx pytest -q`
 
 ## Helper script: `scripts/init_project.py`
 
@@ -102,13 +112,13 @@ This skill includes `scripts/init_project.py`, a small CLI wrapper that:
 Usage examples:
 
 - Create a package:
-  python scripts/init_project.py --type package --name example-pkg --path /Users/wgu/Documents/PyCharm Projects
+  `python scripts/init_project.py --type package --name example-pkg --path /Users/wgu/Documents/PyCharm Projects`
 
 - Create a library:
-  python scripts/init_project.py --type lib --name example-lib
+  `python scripts/init_project.py --type lib --name example-lib`
 
 - Create an app:
-  python scripts/init_project.py --type app --name example-app
+  `python scripts/init_project.py --type app --name example-app`
 
 ## Safety & Conventions
 
@@ -124,7 +134,7 @@ Usage examples:
 ## Implementation notes for maintainers
 
 - The script intentionally writes a minimal canonical `pyproject.toml` and will replace whatever `uv init` produced. This enforces the organization's project template (Python version, uv_build backend, empty deps, and a single default script entry).
-- Tests for this skill should be included if automation is desired (not included by default).
+- Tests for this skill should be included.
 
 ---
 

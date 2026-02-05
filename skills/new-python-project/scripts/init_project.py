@@ -48,7 +48,7 @@ Short description for {proj_name}.
 """
 
 INIT_PY_TEMPLATE = """def main():
-    """Entry point placeholder for {proj_name} """
+    # Entry point placeholder for {proj_name}
     print("Hello from {proj_name}")
 """
 
@@ -146,7 +146,10 @@ def main():
 
     # Run uv init
     print(f"Initializing project with UV: type={args.type}, name={args.name}")
-    init_with_uv(args.type, args.name, args.path)
+    if (project_dir / "pyproject.toml").exists():
+        print("pyproject.toml already exists; skipping uv init")
+    else:
+        init_with_uv(args.type, args.name, args.path)
 
     # Create canonical files and structure
     create_standard_files(project_dir, args.name, args.type, force=args.force)
