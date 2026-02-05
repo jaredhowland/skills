@@ -7,7 +7,7 @@ description: "Initialize new Python apps, packages, or libraries using UV with P
 
 ## Overview
 
-This skill initializes a new Python *app*, *package*, or *library* using UV (https://docs.astral.sh/uv/). Use this skill when you want a consistent, opinionated starter that:
+This skill initializes a new Python project as either a *package* or *library* using UV (https://docs.astral.sh/uv/). If not specified, make it a package. Use this skill when you want a consistent, opinionated starter that:
 
 - Uses Python >=3.14 (written as `requires-python = ">=3.14"`) ✅
 - Always runs all commands through `uv` / `uvx` (no direct `pip`/`python`/`ruff`/`pytest` calls) 🔧
@@ -116,9 +116,6 @@ Usage examples:
 
 - Create a library:
   `python scripts/init_project.py --type lib --name example-lib`
-
-- Create an app:
-  `python scripts/init_project.py --type app --name example-app`
 
 ## Safety & Conventions
 

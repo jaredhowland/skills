@@ -52,6 +52,10 @@ INIT_PY_TEMPLATE = """def main():
     print("Hello from {proj_name}")
 """
 
+TEST_TEMPLATE = """def test_smoke():
+    assert True
+"""
+
 
 def run(cmd: list[str], cwd: Path | None = None):
     print("Running:", " ".join(cmd))
@@ -59,9 +63,19 @@ def run(cmd: list[str], cwd: Path | None = None):
 
 
 def safe_write_text(path: Path, text: str, *, force: bool = False):
-    if path.exists() and path.is_file() and not force:
-        print(f"Refusing to overwrite {path} (use --force to override)")
-        raise SystemExit(1)
+    """Write text to `path` but do not error if the file already exists unless `force=True`.
+
+    If the file exists and `force` is False, skip writing and return. This avoids
+    failing when upstream tools like `uv init` have already created files.
+    """
+    if path.exists():
+        if not force:
+            if path.is_file():
+                print(f"Skipping existing file {path}")
+                return
+            # Path exists but is not a file (e.g., a directory) - don't attempt to overwrite
+            print(f"Skipping existing path {path} (not overwriting)")
+            return
     path.write_text(text)
     print(f"Wrote {path}")
 
@@ -76,7 +90,7 @@ def ensure_uv_available():
         raise SystemExit(1)
 
 
-def init_with_uv(project_type: str, name: str, base: Path):
+def init_with_uv(project_type: str, name: str, base: Path, force: bool = False):
     cmd = ["uv", "init"]
     if project_type == "package":
         cmd += ["--package", name]
@@ -84,14 +98,24 @@ def init_with_uv(project_type: str, name: str, base: Path):
         cmd += ["--lib", name]
     else:  # app
         cmd += [name]
+    if force:
+        cmd += ["--force"]
 
     run(cmd, cwd=base)
 
 
 def create_standard_files(project_dir: Path, name: str, project_type: str, force: bool = False):
+    # Ensure the project directory exists so writes succeed even if `uv` didn't run or
+    # only created some files.
+    project_dir.mkdir(parents=True, exist_ok=True)
+
     # .python-version
-    (project_dir / ".python-version").write_text(PYTHON_VERSION)
-    print("Wrote .python-version")
+    py_ver_file = project_dir / ".python-version"
+    if not py_ver_file.exists() or force:
+        py_ver_file.write_text(PYTHON_VERSION)
+        print("Wrote .python-version")
+    else:
+        print("Skipping existing .python-version")
 
     # README
     safe_write_text(project_dir / "README.md", README_TEMPLATE.format(proj_name=name), force=force)
@@ -109,10 +133,18 @@ def create_standard_files(project_dir: Path, name: str, project_type: str, force
     src_dir.mkdir(parents=True, exist_ok=True)
     safe_write_text(src_dir / "__init__.py", INIT_PY_TEMPLATE.format(proj_name=name), force=force)
 
-    # For libraries, create py.typed
-    if project_type == "lib":
-        (src_dir / "py.typed").write_text("# marker file for typed package")
+    # Always create py.typed so type checkers treat package as typed
+    py_typed = src_dir / "py.typed"
+    if not py_typed.exists() or force:
+        py_typed.write_text("# marker file for typed package")
         print("Wrote py.typed")
+    else:
+        print("Skipping existing py.typed")
+
+    # Ensure tests/ directory exists with a simple smoke test
+    tests_dir = project_dir / "tests"
+    tests_dir.mkdir(parents=True, exist_ok=True)
+    safe_write_text(tests_dir / "test_smoke.py", TEST_TEMPLATE, force=force)
 
 
 def init_git(project_dir: Path):
@@ -139,17 +171,11 @@ def main():
 
     ensure_uv_available()
 
-    project_dir = (args.path / args.name).resolve()
-    if project_dir.exists() and any(project_dir.iterdir()) and not args.force:
-        print(f"Error: target directory {project_dir} already exists and is not empty. Use --force to override.")
-        raise SystemExit(1)
-
-    # Run uv init
+    # Run uv init first to have UV create the directory structure.
     print(f"Initializing project with UV: type={args.type}, name={args.name}")
-    if (project_dir / "pyproject.toml").exists():
-        print("pyproject.toml already exists; skipping uv init")
-    else:
-        init_with_uv(args.type, args.name, args.path)
+    init_with_uv(args.type, args.name, args.path, force=args.force)
+
+    project_dir = (args.path / args.name).resolve()
 
     # Create canonical files and structure
     create_standard_files(project_dir, args.name, args.type, force=args.force)
