@@ -84,16 +84,18 @@ Notes:
 
 - Initialize (example package):
 
-  uv init --package example-pkg
+  `uv init --package example-pkg`
 
 - Lint / format with `ruff` via UV: ⚠️ run these through `uvx`
 
-  `uvx ruff format .``
-  `uvx ruff check --fix .``
+  ```python
+  uvx ruff format .
+  uvx ruff check --fix .
+  ```
 
-- Run type checkers with `mypy` via UV:
+- Run type checkers with `ty` via UV:
 
-  `uvx mypy .``
+  `uvx ty .`
 
 - Run tests (pytest) via UV:
 
