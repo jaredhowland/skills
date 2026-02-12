@@ -23,7 +23,7 @@ from pathlib import Path
 import sys
 
 DEFAULT_BASE = Path("/Users/wgu/Documents/PyCharm Projects")
-PYTHON_VERSION = "3.14"
+PYTHON_VERSION = "3.12"
 UV_BUILD_REQUIRE = "uv_build>=0.9.30,<0.10.0"
 
 PYPROJECT_TEMPLATE = """[project]
@@ -31,7 +31,10 @@ name = "{proj_name}"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.14"
+authors = [
+    { name = "Jared Howland", email = "{proj_name}@jaredhowland.com" }
+]
+requires-python = ">=3.12"
 dependencies = []
 
 [project.scripts]

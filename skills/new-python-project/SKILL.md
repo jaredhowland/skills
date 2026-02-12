@@ -65,7 +65,7 @@ readme = "README.md"
 authors = [
     { name = "Jared Howland", email = "example-pkg@jaredhowland.com" }
 ]
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 dependencies = []
 
 [project.scripts]
@@ -78,7 +78,7 @@ build-backend = "uv_build"
 
 Notes:
 - All projects should include a `py.typed` file inside the package directory so type checkers treat them as typed.
-- `requires-python` must be `">=3.14"` per organizational standard.
+- `requires-python` must support the latest 3 major Python versions per organizational standard.
 
 ## Commands (always via UV)
 
@@ -89,13 +89,13 @@ Notes:
 - Lint / format with `ruff` via UV: ⚠️ run these through `uvx`
 
   ```python
-  uvx ruff format .
-  uvx ruff check --fix .
+  uvx ruff format
+  uvx ruff check --fix
   ```
 
 - Run type checkers with `ty` via UV:
 
-  `uvx ty .`
+  `uvx ty check`
 
 - Run tests (pytest) via UV:
 
@@ -122,7 +122,7 @@ Usage examples:
 ## Safety & Conventions
 
 - All files created by this skill are small, deterministic, and intended as a starting point.
-- Use `uvx ruff format .` and `uvx ruff check --fix .` immediately after initialization to ensure consistent formatting.
+- Use `uvx ty check`, `uvx ruff format`, and `uvx ruff check --fix` immediately after initialization to ensure consistent formatting.
 - Do not embed long boilerplate or copyrighted content. Keep README short and editable.
 
 ## Troubleshooting
