@@ -188,8 +188,9 @@ def main():
 
     print("\nDone. Next steps:")
     print("  cd", project_dir)
-    print("  uvx ruff format .")
-    print("  uvx ruff check --fix .")
+    print("  uvx ty check")
+    print("  uvx ruff format")
+    print("  uvx ruff check --fix")
     print("  uvx pytest -q")
 
 
